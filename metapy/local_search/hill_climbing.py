@@ -8,8 +8,7 @@ hill-climbing local search and associated classes/functions
 import numpy as np
 import time
 
-
-class HillClimberRandomRestarts():
+class HillClimberRandomRestarts:
     '''
     Implementation of Hill-Climbing with Random Restarts
     '''
@@ -53,7 +52,7 @@ class HillClimberRandomRestarts():
 
         
 
-class HillClimber(object):
+class HillClimber:
     '''
     Simple first improvement hill climbing algorithm
     

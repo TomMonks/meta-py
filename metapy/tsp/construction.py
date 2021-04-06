@@ -114,8 +114,6 @@ class FurthestInsertion(object):
         return index
                
                
-               
-        
         
     def furthest_city_index(self, from_city):
         cost = 0
