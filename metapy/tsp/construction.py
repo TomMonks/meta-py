@@ -158,4 +158,4 @@ class FurthestInsertion(object):
             - self.matrix[i][i+1]                     
             
         
-    
+

@@ -7,6 +7,7 @@ between them.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from decimal import Decimal, ROUND_HALF_UP
 
 def gen_matrix(cities, as_integer=False):
