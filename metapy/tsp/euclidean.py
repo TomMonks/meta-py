@@ -67,3 +67,60 @@ def euclidean_distance2(city1, city2):
     """
     v = np.square(city1 - city2)
     return np.sqrt(np.sum(v))
+
+
+def plot_tour(tour, cities, figsize=(6,4)):
+    '''
+    Plots a tour.  Each city visited is
+    labelled in order.  Red point is the initial city.
+    
+    Params:
+    ------
+    tour: np.ndarray
+        ordered vector representing tour e.g. [1, 4, 2, 3]
+        
+    cities: np.ndarray
+        matrix representing city coordinates
+        
+    figsize: tuple, optional (default = (6,3))
+        tuple of ints for figure size
+        
+    Returns
+    -------
+        tuple of matplotlib figure, and axis
+    '''
+
+    tour_length = len(tour)
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+
+    #plot points
+    ax.plot(cities[:tour_length][:, 0],
+            cities[:tour_length][:, 1],'bo')
+
+    #plot lines
+    for j in range(len(tour)-1):
+        city_1 = tour[j]
+        city_2 = tour[j+1]
+
+        #lookup coordinates
+        coords_1 = cities[city_1]
+        coords_2 = cities[city_2]
+        coords = np.vstack([coords_1, coords_2])
+
+        #plot lines
+        ax.plot(coords[:,0], coords[:,1], 'g-')
+        
+        #show order in tour
+        ax.text(coords_1[0] + 0.8, coords_1[1] + 0.8, str(j))
+
+    #add in loop back colour code in red...
+    city_1 = tour[-1]
+    city_2 = tour[0]
+
+    coords_1 = cities[city_1]
+    coords_2 = cities[city_2]
+    coords = np.vstack([coords_1, coords_2])
+    ax.text(coords_1[0] + 0.8, coords_1[1] + 0.8, str(tour_length-1))
+    ax.plot(coords[:,0], coords[:,1], 'r--')
+        
+    return fig, ax
