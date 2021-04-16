@@ -8,12 +8,26 @@ between them.
 
 import numpy as np
 
-def gen_matrix(cities):
+def gen_matrix(cities, as_integer=False):
     """
     Creates a numpy array of euclidian distances between 2 sets of
     cities
     
-    @points = numpy arrange of coordinate pairs
+    Parameters:
+    ----------
+    points: numpy.array
+        coordinate pairs
+    
+    as_integers: bool, optional (default=False)
+        If true then round to nearest int
+        Behaviour: 1.5 -> 2
+                   1.2 -> 1
+                   1.8 -> 2
+                   
+    Returns:
+    -------
+        np.ndarray
+            Matrix of city to city costs
     
     """
     size = len(cities)
@@ -25,7 +39,10 @@ def gen_matrix(cities):
     for city1 in cities:
         col = 0
         for city2 in cities:
-            matrix[row, col] = euclidean_distance(city1, city2)
+            distance = e.euclidean_distance(city1, city2)
+            if as_integer:
+                distance = int(Decimal(distance).quantize(0, ROUND_HALF_UP))
+            matrix[row, col] = distance
             col+=1
         row +=1
         
