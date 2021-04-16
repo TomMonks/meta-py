@@ -7,6 +7,7 @@ between them.
 """
 
 import numpy as np
+from decimal import Decimal, ROUND_HALF_UP
 
 def gen_matrix(cities, as_integer=False):
     """
@@ -39,7 +40,7 @@ def gen_matrix(cities, as_integer=False):
     for city1 in cities:
         col = 0
         for city2 in cities:
-            distance = e.euclidean_distance(city1, city2)
+            distance = euclidean_distance(city1, city2)
             if as_integer:
                 distance = int(Decimal(distance).quantize(0, ROUND_HALF_UP))
             matrix[row, col] = distance
