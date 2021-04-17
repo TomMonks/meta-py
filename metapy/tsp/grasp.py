@@ -5,6 +5,7 @@ classes and functions.
 '''
 
 import numpy as np
+import time
 
 class FixedRCLSizer:
     '''
