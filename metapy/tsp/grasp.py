@@ -149,6 +149,91 @@ class SemiGreedyConstructor:
         '''
         return self.rng.choice(rcl)
     
+    
+class GRASP:
+    '''
+    Greedy Randomised Adaptive Search Procedure algorithm
+    for the Travelling Salesman Problem.
+    
+    
+    The class has the following properties
+    .best: float
+        the best cost
+        
+    .best_solution: np.ndarray
+        the best tour found
+    
+    '''
+    def __init__(self, constructor, local_search, max_iter=1000,
+                 time_limit=np.inf):
+        '''
+        Constructor
+        
+        Parameters:
+        ---------
+        constructor: object
+            semi-greedy construction heuristic
+            
+        local_search: object
+            local search heuristic e.g. `HillClimber`
+            
+        max_iter: int, optional (default=1000)
+            The maximum number of iterations (restarts) of GRASP
+            
+        time_limit: float64, optional (default=np.inf)
+            The maximum allowabl run time.
+            
+        
+        '''
+        # semi greedy tour construction method
+        self.constructor = constructor
+        
+        # local search procedure
+        self.local_search = local_search
+        
+        # max runtime budget for GRASP
+        self.max_iter = max_iter
+        self.time_limit = time_limit
+        
+        # init solution 
+        self.best_solution = None
+        self.best = None
+    
+        
+    def solve(self):
+        '''
+        Run GRASP
+        
+        Returns:
+        -------
+        None
+        '''
+        
+        self.best_solution = None
+        self.best = -np.inf
+        
+        i = 0
+        start = time.time()
+    
+        while i < self.max_iter and ((time.time() - start) < self.time_limit):
+            
+            i += 1
+            
+            # construction phase
+            solution = self.constructor.build()
+            
+            # Improve solution via local search
+            self.local_search.set_init_solution(solution)
+            self.local_search.solve()
+            
+            current_solution = self.local_search.best_solutions[0]
+            current = self.local_search.best_cost
+            
+            # check if better than current solution
+            if current > self.best:
+                self.best = current
+                self.best_solution = current_solution
+    
 
     
 
