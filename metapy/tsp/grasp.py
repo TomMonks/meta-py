@@ -537,3 +537,45 @@ class RandomPlusGreedyConstructor(SemiGreedyConstructor):
             solution = np.append(solution, np.array([next_city]))
             
         return solution        
+
+    
+class ConstructorWithMemory:
+    '''
+    Provides a construction heuristic with a short term memory
+    '''
+    def __init__(self, constructor, memory_size=100):
+        '''Constructor method
+        
+        Params:
+        -------
+        constructor: Object
+            Implements build() and returns a solution
+            
+        memory_size, int, optional (default=100)
+            size of tabu list
+        '''
+        self.constructor = constructor
+        self.memory_size = memory_size
+        # memory implemented as list
+        self.history = []
+        
+    def build(self):
+        '''
+        Run the stochastic construction heuristic
+        
+        Re-runs heuristic if results is within memory
+        
+        Returns:
+        --------
+        np.ndarray
+        '''
+        solution = self.constructor.build()
+        while str(solution) in self.history:
+            solution = self.constructor.build()
+        
+        # if at capacity remove oldest solution
+        if len(self.history) >= self.memory_size: 
+            self.history.pop(0)
+        
+        self.history.append(str(solution))
+        return solution
