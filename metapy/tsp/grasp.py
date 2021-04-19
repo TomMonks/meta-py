@@ -465,4 +465,75 @@ class ReactiveRCLSizer:
         self.r_probs.
         '''
         return self.r_list[self.index]
-       
+    
+    
+class RandomPlusGreedyConstructor(SemiGreedyConstructor):
+    '''
+    Random + semi-greedy construction of a tour.
+    
+    The first n cities of a tour are randomly constructed.  
+    The remaining cities are seleted using the standard semi-greedy approach.
+    
+    For a city i creates a restricted candidate list of size r
+    i.e the r shortest distances from city i.  Next city is chosen
+    with equal probability. 
+    
+    Repeats until tour is constructed.
+    
+    '''
+    def __init__(self, rcl_sizer, tour, matrix, p_rand=0.2,
+                 random_seed=None):
+        '''
+        RandomPlusGreedy Constructor method
+        
+        Params:
+        ------
+        rcl_sizer: object
+            sizes the restricted candidate list
+        
+        tour: np.ndarray
+            vector of city indexes included in problem
+            
+        matrix: np.ndarray
+            matrix of travel costs
+            
+        p_rand: float, optional (default=0.2)
+            Proportion of tour that is randomly constructed
+            
+        random_seed: int
+            used to control sampling provides a
+            reproducible result.
+        '''
+        
+        # super class init
+        super().__init__(rcl_sizer, tour, matrix,
+                       random_seed)
+        
+        # proportion of tour that is randomly constructed
+        self.p_rand = p_rand
+        self.n_rand = int(p_rand * len(tour))
+        self.n_greedy = len(tour) - self.n_rand - 1
+        
+    
+    def build(self):
+        '''
+        Random followed by semi-greedy contruction of tour
+        
+        Returns:
+        --------
+        np.array
+        '''
+        # first city in tour
+        solution = np.array([self.tour[0]])    
+        # next n_rand cities are random
+        rand = self.rng.choice(self.tour[1:], size=self.n_rand, replace=False)
+        solution = np.append(solution, rand)
+        
+        # remaining cities are semi-greedy
+        for i in range(self.n_greedy):
+            r = self.rcl_sizer.get_size()
+            rcl = self.get_rcl(r, solution, solution[-1])
+            next_city = self.random_from_rcl(rcl)
+            solution = np.append(solution, np.array([next_city]))
+            
+        return solution        
