@@ -579,3 +579,117 @@ class ConstructorWithMemory:
         
         self.history.append(str(solution))
         return solution
+    
+class EliteSet:
+    '''
+    Tracks and updates an elite set of solutions produced by a local search.
+    '''
+    def __init__(self, local_search=None, max_size=10, min_delta=0):
+        '''
+        Constructor
+        Params:
+        -------
+        local_search: MonitoredLocalSearch
+            The local search that produces candidates for the elite
+            set.
+        
+        max_size: int, optional (default=10)
+            maximum entries in the elite set
+
+        min_delta: int, optional (Default=0)
+            The min cardinality difference between tours to allow entry
+            E.g. a = [1, 2, 3, 4, 5]; b = [1, 3, 4, 2, 5]. delta = 3.
+            Vary delta > 0 to increase diversity (but may limit entry)
+        '''
+        if local_search is not None:
+            self.local_search = local_search
+            local_search.register_observer(self)
+        
+        self.min_delta = min_delta
+        self.max_size = max_size
+        
+        # data structures for elite solutions
+        self.solutions = None
+        self.costs = None
+        
+        self.n_updates = 0
+    
+    @property
+    def is_empty(self):
+        return self.solutions is None
+    
+    def is_elite(self, solution):
+        '''
+        Is the solution a member of the elite set
+        
+        Params:
+        ------
+        solution: np.ndarray
+            TSP solutution
+            
+        Returns:
+        --------
+        bool
+        '''
+        if self.solutions is None:
+            return False
+        else:
+            result = np.where((self.solutions==solution).all(axis=1))[0]
+            return len(result) > 0
+    
+    def local_search_terminated(self, *args, **kwargs):
+        ''''
+        Termination of the local search
+        '''
+        s = args[1]
+        s_cost = args[0]
+        self.update(s, s_cost)
+            
+    def init_elite_set(self, s, s_cost):
+        '''
+        Initalise the elite set
+        '''
+        self.solutions = np.array([s])
+        self.costs = np.array([s_cost])
+    
+    def update(self, s, s_cost):
+        '''
+        Update the elite set to maximise performance and diversity
+
+        Params:
+        -------
+        s: np.ndarray
+            TSP tour
+
+        s_cost: float
+            TSP tour cost
+
+        Returns:
+        -------
+        Tuple: np.ndarray, np.ndarray
+            elite_set, elite_costs
+        '''
+        if self.solutions is None:
+            self.init_elite_set(s, s_cost)
+        
+        elif len(self.solutions) < self.max_size:
+            delta = (s != self.solutions).sum(axis=1).min()
+            if delta > self.min_delta:
+                self.solutions = np.append(self.solutions, [s], axis=0)
+                self.costs = np.append(self.costs, [s_cost], axis=0)
+        else:
+            # aim to increase performance and diversity of elite set
+            worst_cost = self.costs.min()
+            delta = (s != self.solutions).sum(axis=1).min()
+
+            if s_cost > worst_cost and delta > self.min_delta:
+                replace_idx = self.costs.argmin()
+                self.solutions[replace_idx] = s
+                self.costs[replace_idx] = s_cost
+                self.n_updates += 1
+                
+    def get_best_solution(self):
+        '''Returns the best solution and cost
+        from the elite set'''
+        best_idx = np.array(self.costs).argmax()
+        return self.solutions[best_idx], self.costs[best_idx]
