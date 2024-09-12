@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "meta-py"
+name = "metapy"
 dynamic = ["version"]
 description = "Metaheuristic and optimisation tools for education"
 readme = "README.md"
