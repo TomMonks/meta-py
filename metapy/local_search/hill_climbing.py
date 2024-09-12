@@ -91,7 +91,7 @@ class HillClimber:
         
         #hill climbing time limit
         if time_limit is None:
-            self._time_limit = np.Inf
+            self._time_limit = np.inf
         else:
             self._time_limit = time_limit
  
